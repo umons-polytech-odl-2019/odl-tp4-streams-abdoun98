@@ -4,6 +4,7 @@ import be.ac.umons.exercice2.Student;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 public class Classroom {
@@ -22,7 +23,7 @@ public class Classroom {
 
     public double averageScore() {
 
-        double sum = 0;
+        /*double sum = 0;
         int cpt = 0;
         for (Student student : students) {
             for (Map.Entry<String, Integer> courses : student.getScoreByCourse().entrySet()) {
@@ -30,7 +31,12 @@ public class Classroom {
                 cpt++;
             }
         }
-        return (sum / cpt);
+        return (sum / cpt);*/
+
+        return students.stream()        //map(string,score)          //prend scores      //transforme en entiers
+                .flatMapToInt(student -> student.getScoreByCourse().values().stream().mapToInt(Integer::intValue))      //fait correspondre classe étudiant à entier
+                        .average()
+                        .orElse(0.0);
     }
 
     public int countStudents() {
@@ -51,7 +57,7 @@ public class Classroom {
 
     public List<Student> successfulStudents() {
 
-        Set<Student> studentSet = new TreeSet<>(
+        /*Set<Student> studentSet = new TreeSet<>(
                 Comparator.comparingDouble(student -> -student.averageScore()));
 
         for (Student s : students) {
@@ -63,7 +69,12 @@ public class Classroom {
         List<Student> studentList = new ArrayList<>();
         for (Student s : studentSet)
             studentList.add(s);
-        return studentList;
+        return studentList;*/
+
+        return students.stream()
+                .filter(Student::isSuccessful)
+                .sorted(Comparator.comparingDouble(student -> -student.averageScore()))
+                .collect(Collectors.toList());
 
     }
 }
